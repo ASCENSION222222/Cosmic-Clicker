@@ -1,0 +1,673 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Cosmic Clicker</title>
+    <style>
+      :root {
+        --bg: #040611;
+        --panel: #11162a;
+        --panel-2: #1a2240;
+        --text: #f4f7ff;
+        --accent: #ffd53d;
+        --accent-2: #ffa500;
+        --good: #7eff9e;
+        --muted: #9db0df;
+      }
+
+      * {
+        box-sizing: border-box;
+      }
+
+      body {
+        margin: 0;
+        font-family: Inter, system-ui, -apple-system, Segoe UI, Roboto, sans-serif;
+        background: radial-gradient(circle at 25% 20%, #1e2450 0, #090d1f 30%, var(--bg) 70%);
+        color: var(--text);
+        min-height: 100vh;
+      }
+
+      .starscape::before,
+      .starscape::after {
+        content: "";
+        position: fixed;
+        inset: 0;
+        pointer-events: none;
+        background-image:
+          radial-gradient(2px 2px at 20px 30px, #fff, transparent),
+          radial-gradient(2px 2px at 90px 150px, #fff8, transparent),
+          radial-gradient(1px 1px at 180px 80px, #fff, transparent),
+          radial-gradient(1px 1px at 260px 200px, #fff, transparent),
+          radial-gradient(2px 2px at 320px 40px, #fff8, transparent);
+        background-size: 360px 240px;
+        opacity: 0.3;
+        animation: twinkle 18s linear infinite;
+      }
+
+      .starscape::after {
+        animation-duration: 25s;
+        opacity: 0.2;
+        transform: scale(1.3);
+      }
+
+      @keyframes twinkle {
+        from {
+          transform: translateY(0);
+        }
+        to {
+          transform: translateY(120px);
+        }
+      }
+
+      .layout {
+        display: grid;
+        grid-template-columns: 1.2fr 1fr;
+        gap: 1rem;
+        width: min(1200px, 95vw);
+        margin: 1rem auto;
+      }
+
+      .card {
+        background: linear-gradient(160deg, #11162a, #090d1f);
+        border: 1px solid #273158;
+        border-radius: 16px;
+        padding: 1rem;
+        box-shadow: 0 0 0 1px #1b2240, 0 18px 35px #0008;
+      }
+
+      .header {
+        grid-column: 1 / -1;
+        display: grid;
+        grid-template-columns: 1fr auto;
+        align-items: center;
+        gap: 1rem;
+      }
+
+      h1,
+      h2,
+      h3 {
+        margin: 0.2rem 0;
+      }
+
+      .resources {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 0.7rem;
+      }
+
+      .resource-pill {
+        background: #1a2240;
+        border: 1px solid #2e3b6d;
+        border-radius: 999px;
+        padding: 0.4rem 0.8rem;
+        color: #e8eeff;
+      }
+
+      .left-col {
+        display: flex;
+        flex-direction: column;
+        gap: 1rem;
+      }
+
+      .star-wrap {
+        text-align: center;
+      }
+
+      #starButton {
+        width: min(340px, 65vw);
+        aspect-ratio: 1;
+        border: none;
+        border-radius: 50%;
+        cursor: pointer;
+        position: relative;
+        background: radial-gradient(circle at 35% 35%, #fff8c4 0, #ffe380 25%, #ffb300 55%, #ff7a00 90%);
+        box-shadow: 0 0 30px #ffcf4b99, 0 0 90px #ff8c0080;
+        transition: transform 0.06s ease, filter 0.2s ease;
+      }
+
+      #starButton:hover {
+        filter: brightness(1.05);
+      }
+
+      #starButton:active,
+      #starButton.pulse {
+        transform: scale(0.96);
+      }
+
+      #starButton::after {
+        content: "★";
+        color: #ffffffcc;
+        position: absolute;
+        font-size: clamp(3rem, 9vw, 5.5rem);
+        inset: 0;
+        display: grid;
+        place-items: center;
+        text-shadow: 0 0 10px #fff;
+      }
+
+      .name-bar {
+        display: flex;
+        gap: 0.5rem;
+        justify-content: center;
+        margin-top: 0.8rem;
+      }
+
+      input,
+      select,
+      button {
+        background: var(--panel-2);
+        color: var(--text);
+        border: 1px solid #324278;
+        border-radius: 10px;
+        padding: 0.45rem 0.65rem;
+      }
+
+      button {
+        cursor: pointer;
+      }
+
+      .side-sections {
+        display: grid;
+        grid-template-rows: auto auto 1fr;
+        gap: 1rem;
+      }
+
+      .list {
+        display: grid;
+        gap: 0.45rem;
+        max-height: 300px;
+        overflow: auto;
+      }
+
+      .upgrade {
+        border: 1px solid #334781;
+        background: #131a33;
+        border-radius: 12px;
+        padding: 0.55rem;
+        display: grid;
+        gap: 0.25rem;
+      }
+
+      .upgrade button:disabled {
+        opacity: 0.45;
+        cursor: not-allowed;
+      }
+
+      .achievement {
+        border: 1px solid #2f3b68;
+        border-radius: 10px;
+        padding: 0.4rem;
+        background: #11162a;
+      }
+
+      .achievement.unlocked {
+        border-color: #56df8f;
+        background: #0e271a;
+      }
+
+      .tiny {
+        color: var(--muted);
+        font-size: 0.88rem;
+      }
+
+      .log {
+        min-height: 1.5rem;
+        color: #ffe7aa;
+      }
+
+      @media (max-width: 980px) {
+        .layout {
+          grid-template-columns: 1fr;
+        }
+      }
+    </style>
+  </head>
+  <body class="starscape">
+    <div class="layout">
+      <section class="card header">
+        <div>
+          <h1 id="title">Cosmic Clicker</h1>
+          <div class="tiny" id="subtitle">Forge a stellar civilization by clicking your star.</div>
+        </div>
+        <div class="resources">
+          <div class="resource-pill"><span id="labelStars">Stars</span>: <strong id="starCount">0</strong></div>
+          <div class="resource-pill"><span id="labelPerSecond">Per second</span>: <strong id="sps">0</strong></div>
+          <div class="resource-pill"><span id="labelClicks">Clicks</span>: <strong id="clicks">0</strong></div>
+        </div>
+      </section>
+
+      <section class="left-col">
+        <div class="card star-wrap">
+          <button id="starButton" aria-label="click star"></button>
+          <h2 id="starNameHeading">Unnamed Star</h2>
+          <div class="name-bar">
+            <input id="starNameInput" maxlength="28" placeholder="Name your star" />
+            <button id="nameBtn">Set Name</button>
+          </div>
+          <div class="tiny" id="log" class="log"></div>
+        </div>
+
+        <div class="card">
+          <h3 id="settingsTitle">Settings</h3>
+          <div class="name-bar" style="justify-content:flex-start;">
+            <label for="languageSelect" id="languageLabel">Language:</label>
+            <select id="languageSelect"></select>
+            <label for="themeSelect" id="themeLabel">Theme:</label>
+            <select id="themeSelect">
+              <option value="space">Space</option>
+              <option value="nova">Nova</option>
+              <option value="void">Void</option>
+            </select>
+            <button id="resetBtn">Reset</button>
+          </div>
+        </div>
+      </section>
+
+      <section class="side-sections">
+        <div class="card">
+          <h3 id="upgradesTitle">Upgrades</h3>
+          <div id="upgrades" class="list"></div>
+        </div>
+
+        <div class="card">
+          <h3 id="achievementsTitle">Achievements</h3>
+          <div id="achievements" class="list"></div>
+        </div>
+      </section>
+    </div>
+
+    <script>
+      const i18n = {
+        en: {
+          gameTitle: "Cosmic Clicker",
+          subtitle: "Forge a stellar civilization by clicking your star.",
+          stars: "Stars",
+          perSecond: "Per second",
+          clicks: "Clicks",
+          unnamed: "Unnamed Star",
+          setName: "Set Name",
+          namePlaceholder: "Name your star",
+          settings: "Settings",
+          language: "Language:",
+          theme: "Theme:",
+          reset: "Reset",
+          upgrades: "Upgrades",
+          achievements: "Achievements",
+          bought: "Purchased",
+          cost: "Cost",
+          cps: "stars/s",
+          clickBonus: "click power",
+          logNamed: "Your star is now named",
+          logInsufficient: "Not enough stars.",
+          logReset: "Universe reset complete.",
+          eggNova: "Easter egg found: You whispered 'nova' to the cosmos.",
+          eggCookie: "Easter egg found: This is definitely not a cookie.",
+          eggFortyTwo: "Easter egg found: 42, the cosmic answer."
+        },
+        es: {
+          gameTitle: "Clicker Cósmico",
+          subtitle: "Forja una civilización estelar haciendo clic en tu estrella.",
+          stars: "Estrellas",
+          perSecond: "Por segundo",
+          clicks: "Clics",
+          unnamed: "Estrella sin nombre",
+          setName: "Nombrar",
+          namePlaceholder: "Nombra tu estrella",
+          settings: "Ajustes",
+          language: "Idioma:",
+          theme: "Tema:",
+          reset: "Reiniciar",
+          upgrades: "Mejoras",
+          achievements: "Logros",
+          bought: "Comprado",
+          cost: "Costo",
+          cps: "estrellas/s",
+          clickBonus: "poder de clic",
+          logNamed: "Tu estrella ahora se llama",
+          logInsufficient: "No hay suficientes estrellas.",
+          logReset: "Reinicio del universo completado.",
+          eggNova: "Huevo de pascua: susurraste 'nova' al cosmos.",
+          eggCookie: "Huevo de pascua: Definitivamente no es una galleta.",
+          eggFortyTwo: "Huevo de pascua: 42, la respuesta cósmica."
+        },
+        fr: {
+          gameTitle: "Cliqueur Cosmique",
+          subtitle: "Forgez une civilisation stellaire en cliquant votre étoile.",
+          stars: "Étoiles",
+          perSecond: "Par seconde",
+          clicks: "Clics",
+          unnamed: "Étoile sans nom",
+          setName: "Nommer",
+          namePlaceholder: "Nommez votre étoile",
+          settings: "Paramètres",
+          language: "Langue :",
+          theme: "Thème :",
+          reset: "Réinitialiser",
+          upgrades: "Améliorations",
+          achievements: "Succès",
+          bought: "Acheté",
+          cost: "Coût",
+          cps: "étoiles/s",
+          clickBonus: "puissance de clic",
+          logNamed: "Votre étoile s'appelle maintenant",
+          logInsufficient: "Pas assez d'étoiles.",
+          logReset: "Réinitialisation de l'univers terminée.",
+          eggNova: "Easter egg: vous avez murmuré 'nova' au cosmos.",
+          eggCookie: "Easter egg: ce n'est certainement pas un cookie.",
+          eggFortyTwo: "Easter egg: 42, la réponse cosmique."
+        }
+      };
+
+      const upgradesData = [
+        { id: "solarPanels", name: "Solar Panels", baseCost: 15, cps: 0.4 },
+        { id: "fusionCore", name: "Fusion Core", baseCost: 60, cps: 1.5 },
+        { id: "asteroidMine", name: "Asteroid Mine", baseCost: 180, cps: 4 },
+        { id: "orbitalLab", name: "Orbital Lab", baseCost: 500, cps: 10 },
+        { id: "wormholeTap", name: "Wormhole Tap", baseCost: 1200, cps: 25 },
+        { id: "galaxyForge", name: "Galaxy Forge", baseCost: 3200, cps: 65 },
+        { id: "nebulaFarm", name: "Nebula Farm", baseCost: 9000, cps: 180 },
+        { id: "quantumChoir", name: "Quantum Choir", baseCost: 25000, cps: 450 },
+        { id: "starlightLens", name: "Starlight Lens", baseCost: 55, click: 1 },
+        { id: "supernovaGauntlet", name: "Supernova Gauntlet", baseCost: 600, click: 4 },
+        { id: "singularityFinger", name: "Singularity Finger", baseCost: 4000, click: 15 }
+      ];
+
+      const achievementData = [
+        { id: "firstClick", name: "First Spark", check: s => s.clicks >= 1 },
+        { id: "starter", name: "Rising Heat", check: s => s.stars >= 100 },
+        { id: "steady", name: "Dawn Engine", check: s => s.sps >= 10 },
+        { id: "name", name: "Star Baptism", check: s => !!s.starName },
+        { id: "collector", name: "Hoarder of Light", check: s => s.stars >= 10000 },
+        { id: "clicker", name: "1000 Click Orbit", check: s => s.clicks >= 1000 },
+        { id: "allUpgrades", name: "Tech Constellation", check: s => upgradesData.every(u => (s.upgrades[u.id] || 0) >= 1) },
+        { id: "eggHunter", name: "Egg Hunter", check: s => s.easterEggsFound >= 3 }
+      ];
+
+      const state = {
+        stars: 0,
+        clicks: 0,
+        clickPower: 1,
+        sps: 0,
+        starName: "",
+        language: "en",
+        theme: "space",
+        upgrades: {},
+        achievements: {},
+        easterEggsFound: 0
+      };
+
+      const el = {
+        title: document.getElementById("title"),
+        subtitle: document.getElementById("subtitle"),
+        labelStars: document.getElementById("labelStars"),
+        labelPerSecond: document.getElementById("labelPerSecond"),
+        labelClicks: document.getElementById("labelClicks"),
+        starCount: document.getElementById("starCount"),
+        sps: document.getElementById("sps"),
+        clicks: document.getElementById("clicks"),
+        starButton: document.getElementById("starButton"),
+        starNameHeading: document.getElementById("starNameHeading"),
+        starNameInput: document.getElementById("starNameInput"),
+        nameBtn: document.getElementById("nameBtn"),
+        log: document.getElementById("log"),
+        settingsTitle: document.getElementById("settingsTitle"),
+        languageLabel: document.getElementById("languageLabel"),
+        languageSelect: document.getElementById("languageSelect"),
+        themeLabel: document.getElementById("themeLabel"),
+        themeSelect: document.getElementById("themeSelect"),
+        resetBtn: document.getElementById("resetBtn"),
+        upgradesTitle: document.getElementById("upgradesTitle"),
+        upgrades: document.getElementById("upgrades"),
+        achievementsTitle: document.getElementById("achievementsTitle"),
+        achievements: document.getElementById("achievements")
+      };
+
+      function t(k) {
+        return (i18n[state.language] && i18n[state.language][k]) || i18n.en[k] || k;
+      }
+
+      function format(n) {
+        return Intl.NumberFormat(undefined, { maximumFractionDigits: 1 }).format(n);
+      }
+
+      function save() {
+        localStorage.setItem("cosmicClickerSaveV1", JSON.stringify(state));
+      }
+
+      function load() {
+        const raw = localStorage.getItem("cosmicClickerSaveV1");
+        if (!raw) return;
+        try {
+          const parsed = JSON.parse(raw);
+          Object.assign(state, parsed);
+        } catch {
+          // ignore bad save
+        }
+      }
+
+      function recalc() {
+        state.sps = 0;
+        state.clickPower = 1;
+        for (const up of upgradesData) {
+          const level = state.upgrades[up.id] || 0;
+          if (up.cps) state.sps += up.cps * level;
+          if (up.click) state.clickPower += up.click * level;
+        }
+      }
+
+      function upgradeCost(upgrade) {
+        const level = state.upgrades[upgrade.id] || 0;
+        return Math.floor(upgrade.baseCost * Math.pow(1.16, level));
+      }
+
+      function renderTexts() {
+        el.title.textContent = t("gameTitle");
+        el.subtitle.textContent = t("subtitle");
+        el.labelStars.textContent = t("stars");
+        el.labelPerSecond.textContent = t("perSecond");
+        el.labelClicks.textContent = t("clicks");
+        el.nameBtn.textContent = t("setName");
+        el.starNameInput.placeholder = t("namePlaceholder");
+        el.settingsTitle.textContent = t("settings");
+        el.languageLabel.textContent = t("language");
+        el.themeLabel.textContent = t("theme");
+        el.resetBtn.textContent = t("reset");
+        el.upgradesTitle.textContent = t("upgrades");
+        el.achievementsTitle.textContent = t("achievements");
+      }
+
+      function renderStats() {
+        el.starCount.textContent = format(state.stars);
+        el.sps.textContent = format(state.sps);
+        el.clicks.textContent = format(state.clicks);
+        el.starNameHeading.textContent = state.starName || t("unnamed");
+      }
+
+      function renderUpgrades() {
+        el.upgrades.innerHTML = "";
+        upgradesData.forEach((up) => {
+          const lvl = state.upgrades[up.id] || 0;
+          const cost = upgradeCost(up);
+          const div = document.createElement("div");
+          div.className = "upgrade";
+          div.innerHTML = `
+            <strong>${up.name} (${t("bought")}: ${lvl})</strong>
+            <span class="tiny">${up.cps ? `${up.cps} ${t("cps")}` : `${up.click} ${t("clickBonus")}`}</span>
+            <button ${state.stars < cost ? "disabled" : ""}>
+              ${t("cost")}: ${format(cost)}
+            </button>
+          `;
+          div.querySelector("button").addEventListener("click", () => {
+            if (state.stars < cost) {
+              log(t("logInsufficient"));
+              return;
+            }
+            state.stars -= cost;
+            state.upgrades[up.id] = lvl + 1;
+            recalc();
+            runHiddenChecks(up.name.toLowerCase());
+            update();
+          });
+          el.upgrades.appendChild(div);
+        });
+      }
+
+      function renderAchievements() {
+        el.achievements.innerHTML = "";
+        achievementData.forEach((ach) => {
+          const unlocked = !!state.achievements[ach.id];
+          const row = document.createElement("div");
+          row.className = `achievement ${unlocked ? "unlocked" : ""}`;
+          row.innerHTML = `<strong>${ach.name}</strong><div class="tiny">${unlocked ? "✓" : "..."}</div>`;
+          el.achievements.appendChild(row);
+        });
+      }
+
+      function checkAchievements() {
+        for (const ach of achievementData) {
+          if (!state.achievements[ach.id] && ach.check(state)) {
+            state.achievements[ach.id] = true;
+            log(`🏆 ${ach.name}`);
+          }
+        }
+      }
+
+      function log(msg) {
+        el.log.textContent = msg;
+      }
+
+      function runHiddenChecks(text) {
+        const lower = (text || "").toLowerCase();
+        if (lower.includes("nova") && !state.achievements.egg_nova) {
+          state.achievements.egg_nova = true;
+          state.easterEggsFound += 1;
+          state.stars += 42;
+          log(t("eggNova"));
+        }
+        if (lower.includes("cookie") && !state.achievements.egg_cookie) {
+          state.achievements.egg_cookie = true;
+          state.easterEggsFound += 1;
+          state.stars += 77;
+          log(t("eggCookie"));
+        }
+        if (String(state.starName).trim() === "42" && !state.achievements.egg_42) {
+          state.achievements.egg_42 = true;
+          state.easterEggsFound += 1;
+          state.stars += 420;
+          log(t("eggFortyTwo"));
+        }
+      }
+
+      function applyTheme() {
+        const root = document.documentElement;
+        if (state.theme === "nova") {
+          root.style.setProperty("--bg", "#17050a");
+          root.style.setProperty("--panel", "#2a0f1c");
+          root.style.setProperty("--panel-2", "#3c1430");
+          root.style.setProperty("--accent", "#ff647f");
+        } else if (state.theme === "void") {
+          root.style.setProperty("--bg", "#020203");
+          root.style.setProperty("--panel", "#0d0d12");
+          root.style.setProperty("--panel-2", "#181824");
+          root.style.setProperty("--accent", "#a08bff");
+        } else {
+          root.style.setProperty("--bg", "#040611");
+          root.style.setProperty("--panel", "#11162a");
+          root.style.setProperty("--panel-2", "#1a2240");
+          root.style.setProperty("--accent", "#ffd53d");
+        }
+      }
+
+      function update() {
+        checkAchievements();
+        renderTexts();
+        renderStats();
+        renderUpgrades();
+        renderAchievements();
+        applyTheme();
+        save();
+      }
+
+      function populateLanguageOptions() {
+        const langs = [
+          ["en", "English"],
+          ["es", "Español"],
+          ["fr", "Français"]
+        ];
+        el.languageSelect.innerHTML = "";
+        langs.forEach(([code, name]) => {
+          const opt = document.createElement("option");
+          opt.value = code;
+          opt.textContent = name;
+          el.languageSelect.appendChild(opt);
+        });
+        el.languageSelect.value = state.language;
+      }
+
+      function bindEvents() {
+        el.starButton.addEventListener("click", () => {
+          state.stars += state.clickPower;
+          state.clicks += 1;
+          el.starButton.classList.add("pulse");
+          setTimeout(() => el.starButton.classList.remove("pulse"), 60);
+          if (state.clicks % 250 === 0) log(`✨ ${state.clicks} clicks!`);
+          update();
+        });
+
+        el.nameBtn.addEventListener("click", () => {
+          const name = el.starNameInput.value.trim().slice(0, 28);
+          state.starName = name;
+          runHiddenChecks(name);
+          log(`${t("logNamed")} ${name || t("unnamed")}`);
+          el.starNameInput.value = "";
+          update();
+        });
+
+        el.languageSelect.addEventListener("change", () => {
+          state.language = el.languageSelect.value;
+          update();
+        });
+
+        el.themeSelect.addEventListener("change", () => {
+          state.theme = el.themeSelect.value;
+          update();
+        });
+
+        el.resetBtn.addEventListener("click", () => {
+          localStorage.removeItem("cosmicClickerSaveV1");
+          Object.assign(state, {
+            stars: 0,
+            clicks: 0,
+            clickPower: 1,
+            sps: 0,
+            starName: "",
+            language: "en",
+            theme: "space",
+            upgrades: {},
+            achievements: {},
+            easterEggsFound: 0
+          });
+          recalc();
+          populateLanguageOptions();
+          el.themeSelect.value = state.theme;
+          log(t("logReset"));
+          update();
+        });
+      }
+
+      function gameLoop() {
+        state.stars += state.sps / 5;
+        update();
+      }
+
+      load();
+      recalc();
+      populateLanguageOptions();
+      el.themeSelect.value = state.theme;
+      bindEvents();
+      update();
+      setInterval(gameLoop, 200);
+    </script>
+  </body>
+</html>
